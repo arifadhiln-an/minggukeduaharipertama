@@ -1,0 +1,187 @@
+# Basis Data Part 7 – SQL UNION (Penggabungan Data Vertikal)
+
+## Pendahuluan
+
+Pada modul **Basis Data Part 7**, kita mempelajari cara menggabungkan hasil query secara **vertikal** menggunakan perintah **UNION**. Teknik ini sering digunakan ketika data berasal dari dua atau lebih tabel yang strukturnya sama dan ingin ditampilkan sebagai satu hasil.
+
+Blog ini merangkum:
+
+* Konsep UNION
+* Perbedaan UNION dan JOIN
+* Contoh penggunaan
+* Penyelesaian **Quiz 1, Quiz 2, dan Quiz 3**
+
+---
+
+## 1. Penggabungan Hasil SELECT Secara Vertikal
+
+Penggabungan vertikal berarti **menggabungkan baris data** dari dua tabel atau lebih.
+
+Contoh tabel:
+
+* `tabel_a`
+* `tabel_b`
+
+### Syarat Penggunaan UNION
+
+Agar UNION dapat digunakan, tabel-tabel harus memenuhi syarat berikut:
+
+1. Jumlah kolom sama
+2. Tipe data kolom sama
+3. Urutan kolom sama
+
+---
+
+## 2. Contoh Dasar UNION
+
+```sql
+SELECT kode_pelanggan, nama, alamat FROM tabel_a
+UNION
+SELECT kode_pelanggan, nama, alamat FROM tabel_b;
+```
+
+> UNION secara otomatis menghilangkan data duplikat.
+
+Jika ingin menampilkan semua data termasuk duplikasi:
+
+```sql
+SELECT kode_pelanggan, nama, alamat FROM tabel_a
+UNION ALL
+SELECT kode_pelanggan, nama, alamat FROM tabel_b;
+```
+
+---
+
+## 3. UNION dengan WHERE
+
+Kondisi `WHERE` dapat digunakan pada masing-masing SELECT:
+
+```sql
+SELECT * FROM tabel_a WHERE kota = 'Solo'
+UNION
+SELECT * FROM tabel_b WHERE kota = 'Solo';
+```
+
+---
+
+## 4. Quiz 1 – Jawaban
+
+**Soal:**
+Gabungkan `tabel_a` dan `tabel_b` dengan kondisi `kode_pelanggan = 'polibest03'`.
+
+### Jawaban:
+
+```sql
+SELECT * FROM tabel_a
+WHERE kode_pelanggan = 'polibest03'
+UNION
+SELECT * FROM tabel_b
+WHERE kode_pelanggan = 'polibest03';
+```
+
+---
+
+## 5. Perbedaan UNION dan JOIN
+
+| UNION                     | JOIN                |
+| ------------------------- | ------------------- |
+| Menggabungkan baris       | Menggabungkan kolom |
+| Struktur tabel harus sama | Tidak harus sama    |
+| Vertikal                  | Horizontal          |
+
+---
+
+## 6. Quiz 2 – Jawaban
+
+**Soal:**
+Menampilkan pelanggan yang membeli produk:
+
+* Kotak Pensil
+* Flashdisk 32 GB
+* Sticky Notes 500 sheets
+
+Data diambil dari:
+
+* `ms_pelanggan`
+* `tr_penjualan`
+
+Output:
+
+* kode_pelanggan
+* nama_customer
+* alamat
+
+### Jawaban:
+
+```sql
+SELECT DISTINCT p.kode_pelanggan,
+       p.nama_customer,
+       p.alamat
+FROM ms_pelanggan p
+JOIN tr_penjualan t
+  ON p.kode_pelanggan = t.kode_pelanggan
+WHERE t.nama_produk IN (
+  'Kotak Pensil',
+  'Flashdisk 32 GB',
+  'Sticky Notes 500 sheets'
+);
+```
+
+### Hasil:
+
+| kode_pelanggan | nama_customer      | alamat                                 |
+| -------------- | ------------------ | -------------------------------------- |
+| polibest01     | Eva Novianti, S.H. | Vila Sempilan, No. 67 - Kota B         |
+| polibest03     | Unang Handoko      | Vila Sempilan, No. 1 - Kota B          |
+| polibest05     | Tommy Sinaga       | Vila Permata Intan Berkilau, Blok A1/2 |
+| polibest07     | Agus Cahyono       | Vila Gunung Seribu, Blok F4 - No. 8    |
+
+---
+
+## 7. Quiz 3 – Jawaban
+
+**Soal:**
+Menyiapkan katalog produk dengan ketentuan:
+
+* `prod-01` s.d `prod-05` harga < 100.000
+* `prod-06` s.d `prod-10` harga < 50.000
+
+Data berasal dari:
+
+* `ms_produk_1`
+* `ms_produk_2`
+
+### Jawaban:
+
+```sql
+SELECT nama_produk, kode_produk, harga
+FROM ms_produk_1
+WHERE (kode_produk BETWEEN 'prod-01' AND 'prod-05' AND harga < 100000)
+   OR (kode_produk BETWEEN 'prod-06' AND 'prod-10' AND harga < 50000)
+
+UNION
+
+SELECT nama_produk, kode_produk, harga
+FROM ms_produk_2
+WHERE (kode_produk BETWEEN 'prod-01' AND 'prod-05' AND harga < 100000)
+   OR (kode_produk BETWEEN 'prod-06' AND 'prod-10' AND harga < 50000);
+```
+
+### Hasil:
+
+| nama_produk                | kode_produk | harga |
+| -------------------------- | ----------- | ----- |
+| Kotak Pensil DQLab         | prod-01     | 62500 |
+| Flashdisk DQLab 64 GB      | prod-02     | 55000 |
+| Flashdisk DQLab 32 GB      | prod-04     | 40000 |
+| Tas Travel Organizer DQLab | prod-07     | 48000 |
+| Gantungan Kunci DQLab      | prod-08     | 15800 |
+
+---
+
+## 8. Penutup
+
+Dengan memahami **UNION**, kita dapat menggabungkan data dari berbagai sumber tabel dengan struktur yang sama secara efektif. Teknik ini sangat berguna dalam laporan, katalog data, dan analisis lintas tabel.
+
+---
+
